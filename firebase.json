@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "forge-api",
+    "site": "forgemockapi",
     "public": "public",
     "ignore": [
       "firebase.json",
