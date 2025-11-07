@@ -46,30 +46,45 @@ setGlobalOptions({ maxInstances: 10 });
 
 
 // // READ (GET by ID)
-// app.get("/projects/:id", async (req, res) => {
-//     console.log(req, res)
-//     const projectId = req.params.id; // Access parameters from the URL
-//     const doc = await db.collection("projects").doc(projectId).get();
-//     if (!doc.exists) {
-//         res.status(404).send({ error: "Project not found" });
-//     } else {
-//         res.status(200).send(doc.data());
-//     }
-// });
-
 // custom API to get projects by user ID
 
 app.get("/", async (req, res) => {
     logger.info("Hello logs!", { structuredData: true });
     res.send("Hello from Firebase!");
+    return
+});
+
+app.get("/projects", async (req, res) => {
+    const doc = await db.collection(PROJECTS).get();
+    if (doc.empty) {
+        res.status(404).send({ error: "Project not found" });
+        return
+    } else {
+        const items: DocumentData[] = [];
+        doc.forEach((document) => {
+            items.push({
+                uid: document.id,
+                ...document.data()
+            });
+        });
+        res.status(200).send(items);
+        return
+    }
 });
 
 app.get("/projects/user/:userId", async (req, res) => {
     const uid = req.params.userId;
+
+    if (!uid){
+        res.status(404).send({ error: "user id not found" });
+        return
+    }
+
     const projectRef = await db.collection(PROJECTS);
     const snapshot = await projectRef.where("ownerId", "==", uid).get();
     if (snapshot.empty) {
         res.status(404).send({ error: "Project not found" });
+        return
     } else {
         const items: DocumentData[] = [];
         snapshot.forEach((doc) => {
@@ -79,6 +94,24 @@ app.get("/projects/user/:userId", async (req, res) => {
             });
         });
         res.status(200).send(items);
+        return
+    }
+});
+
+
+app.get("/project/:projectId", async (req, res) => {
+    const projectId = req.params.projectId;
+    
+    if (!projectId){
+        res.status(404).send({ error: "Project id not found" });
+        return
+    }
+    
+    const snapshot = await db.collection(PROJECTS).doc(projectId).get();
+    if (!snapshot.exists) {
+        res.status(404).send({ error: "Project not found" });
+    } else {
+        res.status(200).send(snapshot.data());
     }
 });
 
