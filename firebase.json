@@ -1,23 +1,4 @@
 {
-  "hosting": {
-    "site": "forgemockapi",
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "/api/**",
-        "function": {
-          "functionId": "api",
-          "region": "us-central1",
-          "pinTag": true
-        }
-      }
-    ]
-  },
   "functions": {
     "source": "functions",
     "codebase": "default",
